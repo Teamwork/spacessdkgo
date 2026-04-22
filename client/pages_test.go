@@ -12,7 +12,7 @@ import (
 func TestPageService_Get(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/10/pages/20.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusOK,
 			models.PageResponse{Page: models.Page{ID: 20, Title: "Getting Started"}})
 
 		got, err := newTestClient(mock).Pages.Get(context.Background(), 10, 20)
@@ -29,7 +29,7 @@ func TestPageService_Get(t *testing.T) {
 		if reqs[0].Method != http.MethodGet {
 			t.Errorf("expected GET, got %s", reqs[0].Method)
 		}
-		if reqs[0].URL.Path != "/spaces/10/pages/20.json" {
+		if reqs[0].URL.Path != "/spaces/api/v1/spaces/10/pages/20.json" {
 			t.Errorf("unexpected path %s", reqs[0].URL.Path)
 		}
 	})
@@ -50,7 +50,7 @@ func TestPageService_Get(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Pages.Get(context.Background(), 10, 20)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -61,21 +61,31 @@ func TestPageService_Get(t *testing.T) {
 func TestPageService_List(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/10/pages.json", http.StatusOK,
-			models.PagesResponse{Pages: []models.Page{{ID: 1, Title: "Intro"}, {ID: 2, Title: "Setup"}}})
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages.json", http.StatusOK,
+			models.PagesResponse{Pages: models.PageTreeNode{
+				ID:    1,
+				Title: "Home",
+				ChildPages: []models.PageTreeNode{
+					{ID: 2, Title: "Intro"},
+					{ID: 3, Title: "Setup"},
+				},
+			}})
 
 		got, err := newTestClient(mock).Pages.List(context.Background(), 10, url.Values{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if len(got.Pages) != 2 {
-			t.Fatalf("got %d pages, want 2", len(got.Pages))
+		if got.Pages.ID != 1 {
+			t.Fatalf("got root ID %d, want 1", got.Pages.ID)
+		}
+		if len(got.Pages.ChildPages) != 2 {
+			t.Fatalf("got %d child pages, want 2", len(got.Pages.ChildPages))
 		}
 	})
 
 	t.Run("passes query params", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/10/pages.json", http.StatusOK, models.PagesResponse{})
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages.json", http.StatusOK, models.PagesResponse{})
 
 		_, err := newTestClient(mock).Pages.List(context.Background(), 10,
 			url.Values{"page": {"3"}})
@@ -96,7 +106,7 @@ func TestPageService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/10/pages.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages.json", http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Pages.List(context.Background(), 10, url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -107,7 +117,7 @@ func TestPageService_List(t *testing.T) {
 func TestPageService_Home(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/10/homepage.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/homepage.json", http.StatusOK,
 			models.PageResponse{Page: models.Page{ID: 1, IsHomePage: true}})
 
 		got, err := newTestClient(mock).Pages.Home(context.Background(), 10)
@@ -117,7 +127,7 @@ func TestPageService_Home(t *testing.T) {
 		if !got.Page.IsHomePage {
 			t.Error("expected IsHomePage=true")
 		}
-		if mock.GetRequests()[0].URL.Path != "/spaces/10/homepage.json" {
+		if mock.GetRequests()[0].URL.Path != "/spaces/api/v1/spaces/10/homepage.json" {
 			t.Errorf("unexpected path %s", mock.GetRequests()[0].URL.Path)
 		}
 	})
@@ -131,7 +141,7 @@ func TestPageService_Home(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/10/homepage.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/homepage.json", http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Pages.Home(context.Background(), 10)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -142,7 +152,7 @@ func TestPageService_Home(t *testing.T) {
 func TestPageService_Create(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/10/pages.json", http.StatusCreated,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages.json", http.StatusCreated,
 			models.PageResponse{Page: models.Page{ID: 55, Title: "New Page"}})
 
 		got, err := newTestClient(mock).Pages.Create(context.Background(), 10,
@@ -160,7 +170,7 @@ func TestPageService_Create(t *testing.T) {
 
 	t.Run("success 200", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/10/pages.json", http.StatusOK,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages.json", http.StatusOK,
 			models.PageResponse{Page: models.Page{ID: 1}})
 		_, err := newTestClient(mock).Pages.Create(context.Background(), 10,
 			&models.PageCreate{Title: "X"})
@@ -186,7 +196,7 @@ func TestPageService_Create(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/10/pages.json", http.StatusBadRequest, `{"error":"bad"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages.json", http.StatusBadRequest, `{"error":"bad"}`)
 		_, err := newTestClient(mock).Pages.Create(context.Background(), 10,
 			&models.PageCreate{Title: "X"})
 		if err == nil {
@@ -198,7 +208,7 @@ func TestPageService_Create(t *testing.T) {
 func TestPageService_Duplicate(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/10/pages/20/duplicate.json", http.StatusCreated,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/duplicate.json", http.StatusCreated,
 			models.PageResponse{Page: models.Page{ID: 99, Title: "Copy of Page"}})
 
 		got, err := newTestClient(mock).Pages.Duplicate(context.Background(), 10, 20,
@@ -209,7 +219,7 @@ func TestPageService_Duplicate(t *testing.T) {
 		if got.Page.ID != 99 {
 			t.Errorf("got ID %d, want 99", got.Page.ID)
 		}
-		if mock.GetRequests()[0].URL.Path != "/spaces/10/pages/20/duplicate.json" {
+		if mock.GetRequests()[0].URL.Path != "/spaces/api/v1/spaces/10/pages/20/duplicate.json" {
 			t.Errorf("unexpected path %s", mock.GetRequests()[0].URL.Path)
 		}
 	})
@@ -239,7 +249,7 @@ func TestPageService_Duplicate(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/10/pages/20/duplicate.json", http.StatusBadRequest, `{"error":"bad"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/duplicate.json", http.StatusBadRequest, `{"error":"bad"}`)
 		_, err := newTestClient(mock).Pages.Duplicate(context.Background(), 10, 20,
 			&models.PageDuplicate{Title: "X"})
 		if err == nil {
@@ -253,7 +263,7 @@ func TestPageService_Update(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/10/pages/20.json", http.StatusOK,
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusOK,
 			models.PageResponse{Page: models.Page{ID: 20, Title: "Updated Title"}})
 
 		got, err := newTestClient(mock).Pages.Update(context.Background(), 10, 20,
@@ -294,7 +304,7 @@ func TestPageService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/10/pages/20.json", http.StatusForbidden, `{"error":"forbidden"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusForbidden, `{"error":"forbidden"}`)
 		_, err := newTestClient(mock).Pages.Update(context.Background(), 10, 20,
 			&models.PageUpdate{Title: &title})
 		if err == nil {
@@ -306,7 +316,7 @@ func TestPageService_Update(t *testing.T) {
 func TestPageService_Delete(t *testing.T) {
 	t.Run("success 204", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/10/pages/20.json", http.StatusNoContent, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusNoContent, "")
 		if err := newTestClient(mock).Pages.Delete(context.Background(), 10, 20); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -317,7 +327,7 @@ func TestPageService_Delete(t *testing.T) {
 
 	t.Run("success 200", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/10/pages/20.json", http.StatusOK, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusOK, "")
 		if err := newTestClient(mock).Pages.Delete(context.Background(), 10, 20); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -337,7 +347,7 @@ func TestPageService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Pages.Delete(context.Background(), 10, 20); err == nil {
 			t.Fatal("expected error on 404")
 		}

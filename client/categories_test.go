@@ -12,7 +12,7 @@ import (
 func TestCategoryService_Get(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/categories/3.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/categories/3.json", http.StatusOK,
 			models.CategoryResponse{Category: models.Category{ID: 3, Name: "Engineering"}})
 
 		got, err := newTestClient(mock).Categories.Get(context.Background(), 3)
@@ -25,7 +25,7 @@ func TestCategoryService_Get(t *testing.T) {
 		if got.Category.Name != "Engineering" {
 			t.Errorf("got name %q, want %q", got.Category.Name, "Engineering")
 		}
-		if mock.GetRequests()[0].URL.Path != "/categories/3.json" {
+		if mock.GetRequests()[0].URL.Path != "/spaces/api/v1/categories/3.json" {
 			t.Errorf("unexpected path %s", mock.GetRequests()[0].URL.Path)
 		}
 	})
@@ -39,7 +39,7 @@ func TestCategoryService_Get(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/categories/3.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/categories/3.json", http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Categories.Get(context.Background(), 3)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -50,7 +50,7 @@ func TestCategoryService_Get(t *testing.T) {
 func TestCategoryService_List(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/categories.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/categories.json", http.StatusOK,
 			models.CategoriesResponse{Categories: []models.Category{
 				{ID: 1, Name: "Engineering"},
 				{ID: 2, Name: "Product"},
@@ -67,7 +67,7 @@ func TestCategoryService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/categories.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/categories.json", http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Categories.List(context.Background(), url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -80,7 +80,7 @@ func TestCategoryService_Create(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/categories.json", http.StatusCreated,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/categories.json", http.StatusCreated,
 			models.CategoryResponse{Category: models.Category{ID: 7, Name: "Engineering"}})
 
 		got, err := newTestClient(mock).Categories.Create(context.Background(),
@@ -98,7 +98,7 @@ func TestCategoryService_Create(t *testing.T) {
 
 	t.Run("success 200", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/categories.json", http.StatusOK,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/categories.json", http.StatusOK,
 			models.CategoryResponse{Category: models.Category{ID: 1}})
 		_, err := newTestClient(mock).Categories.Create(context.Background(),
 			&models.CategoryCreate{Name: "X"})
@@ -116,7 +116,7 @@ func TestCategoryService_Create(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/categories.json", http.StatusBadRequest, `{"error":"bad"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/categories.json", http.StatusBadRequest, `{"error":"bad"}`)
 		_, err := newTestClient(mock).Categories.Create(context.Background(),
 			&models.CategoryCreate{Name: "X"})
 		if err == nil {
@@ -130,7 +130,7 @@ func TestCategoryService_Update(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/categories/3.json", http.StatusOK,
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/categories/3.json", http.StatusOK,
 			models.CategoryResponse{Category: models.Category{ID: 3, Name: "Updated Engineering"}})
 
 		got, err := newTestClient(mock).Categories.Update(context.Background(), 3,
@@ -163,7 +163,7 @@ func TestCategoryService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/categories/3.json", http.StatusForbidden, `{"error":"forbidden"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/categories/3.json", http.StatusForbidden, `{"error":"forbidden"}`)
 		_, err := newTestClient(mock).Categories.Update(context.Background(), 3,
 			&models.CategoryUpdate{Name: &name})
 		if err == nil {
@@ -175,7 +175,7 @@ func TestCategoryService_Update(t *testing.T) {
 func TestCategoryService_Delete(t *testing.T) {
 	t.Run("success 204", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/categories/3.json", http.StatusNoContent, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/categories/3.json", http.StatusNoContent, "")
 		if err := newTestClient(mock).Categories.Delete(context.Background(), 3); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -186,7 +186,7 @@ func TestCategoryService_Delete(t *testing.T) {
 
 	t.Run("success 200", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/categories/3.json", http.StatusOK, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/categories/3.json", http.StatusOK, "")
 		if err := newTestClient(mock).Categories.Delete(context.Background(), 3); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -200,7 +200,7 @@ func TestCategoryService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/categories/3.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/categories/3.json", http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Categories.Delete(context.Background(), 3); err == nil {
 			t.Fatal("expected error on 404")
 		}

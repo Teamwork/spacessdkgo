@@ -11,7 +11,7 @@ import (
 func TestSearchService_Search(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/search.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/search.json", http.StatusOK,
 			models.SearchResponse{
 				TotalResults: 2,
 				Results: []models.SearchPage{
@@ -38,7 +38,7 @@ func TestSearchService_Search(t *testing.T) {
 
 	t.Run("encodes query params", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/search.json", http.StatusOK, models.SearchResponse{})
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/search.json", http.StatusOK, models.SearchResponse{})
 
 		limit := int64(10)
 		_, err := newTestClient(mock).Search.Search(context.Background(), models.SearchFilter{
@@ -66,7 +66,7 @@ func TestSearchService_Search(t *testing.T) {
 
 	t.Run("empty filter", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/search.json", http.StatusOK, models.SearchResponse{})
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/search.json", http.StatusOK, models.SearchResponse{})
 
 		_, err := newTestClient(mock).Search.Search(context.Background(), models.SearchFilter{})
 		if err != nil {
@@ -79,7 +79,7 @@ func TestSearchService_Search(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/search.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/search.json", http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Search.Search(context.Background(),
 			models.SearchFilter{Query: "test"})
 		if err == nil {

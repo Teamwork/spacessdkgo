@@ -18,7 +18,7 @@ func newTestClient(transport *MockRoundTripper) *Client {
 func TestSpaceService_Get(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/42.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/42.json", http.StatusOK,
 			models.SpaceResponse{Space: models.Space{ID: 42, Title: "Docs"}})
 
 		got, err := newTestClient(mock).Spaces.Get(context.Background(), 42)
@@ -35,7 +35,7 @@ func TestSpaceService_Get(t *testing.T) {
 		if reqs[0].Method != http.MethodGet {
 			t.Errorf("expected GET, got %s", reqs[0].Method)
 		}
-		if reqs[0].URL.Path != "/spaces/42.json" {
+		if reqs[0].URL.Path != "/spaces/api/v1/spaces/42.json" {
 			t.Errorf("unexpected path %s", reqs[0].URL.Path)
 		}
 	})
@@ -51,7 +51,7 @@ func TestSpaceService_Get(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/1.json", http.StatusNotFound, `{"message":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/1.json", http.StatusNotFound, `{"message":"not found"}`)
 		_, err := newTestClient(mock).Spaces.Get(context.Background(), 1)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -62,7 +62,7 @@ func TestSpaceService_Get(t *testing.T) {
 func TestSpaceService_List(t *testing.T) {
 	t.Run("success no params", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces.json", http.StatusOK,
 			models.SpacesResponse{Spaces: []models.Space{{ID: 1, Title: "First"}}})
 
 		got, err := newTestClient(mock).Spaces.List(context.Background(), url.Values{})
@@ -79,7 +79,7 @@ func TestSpaceService_List(t *testing.T) {
 
 	t.Run("passes query params", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces.json", http.StatusOK, models.SpacesResponse{})
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces.json", http.StatusOK, models.SpacesResponse{})
 
 		params := url.Values{"page": {"2"}, "perPage": {"10"}}
 		_, err := newTestClient(mock).Spaces.List(context.Background(), params)
@@ -93,7 +93,7 @@ func TestSpaceService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces.json", http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Spaces.List(context.Background(), url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -104,7 +104,7 @@ func TestSpaceService_List(t *testing.T) {
 func TestSpaceService_Create(t *testing.T) {
 	t.Run("success 201", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces.json", http.StatusCreated,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces.json", http.StatusCreated,
 			models.SpaceResponse{Space: models.Space{ID: 99, Title: "New Space"}})
 
 		got, err := newTestClient(mock).Spaces.Create(context.Background(),
@@ -122,7 +122,7 @@ func TestSpaceService_Create(t *testing.T) {
 
 	t.Run("success 200", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces.json", http.StatusOK,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces.json", http.StatusOK,
 			models.SpaceResponse{Space: models.Space{ID: 1}})
 		_, err := newTestClient(mock).Spaces.Create(context.Background(),
 			&models.SpaceCreate{Title: "X", Code: "x"})
@@ -140,7 +140,7 @@ func TestSpaceService_Create(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces.json", http.StatusBadRequest, `{"error":"bad request"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces.json", http.StatusBadRequest, `{"error":"bad request"}`)
 		_, err := newTestClient(mock).Spaces.Create(context.Background(),
 			&models.SpaceCreate{Title: "X", Code: "x"})
 		if err == nil {
@@ -154,7 +154,7 @@ func TestSpaceService_Update(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/1.json", http.StatusOK,
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/1.json", http.StatusOK,
 			models.SpaceResponse{Space: models.Space{ID: 1, Title: "Updated"}})
 
 		got, err := newTestClient(mock).Spaces.Update(context.Background(), 1,
@@ -187,7 +187,7 @@ func TestSpaceService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/1.json", http.StatusForbidden, `{"error":"forbidden"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/1.json", http.StatusForbidden, `{"error":"forbidden"}`)
 		_, err := newTestClient(mock).Spaces.Update(context.Background(), 1,
 			&models.SpaceUpdate{Title: &title})
 		if err == nil {
@@ -199,7 +199,7 @@ func TestSpaceService_Update(t *testing.T) {
 func TestSpaceService_Delete(t *testing.T) {
 	t.Run("success 204", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/1.json", http.StatusNoContent, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/1.json", http.StatusNoContent, "")
 		if err := newTestClient(mock).Spaces.Delete(context.Background(), 1); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -210,7 +210,7 @@ func TestSpaceService_Delete(t *testing.T) {
 
 	t.Run("success 200", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/2.json", http.StatusOK, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/2.json", http.StatusOK, "")
 		if err := newTestClient(mock).Spaces.Delete(context.Background(), 2); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -224,7 +224,7 @@ func TestSpaceService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/1.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/1.json", http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Spaces.Delete(context.Background(), 1); err == nil {
 			t.Fatal("expected error on 404")
 		}
@@ -234,7 +234,7 @@ func TestSpaceService_Delete(t *testing.T) {
 func TestSpaceService_Collaborators(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/5/collaborators.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/5/collaborators.json", http.StatusOK,
 			models.SpaceCollaboratorsResponse{
 				CollaboratorsCount: 2,
 				Collaborators: []models.SpaceCollaborator{
@@ -264,7 +264,7 @@ func TestSpaceService_Collaborators(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/5/collaborators.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/5/collaborators.json", http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Spaces.Collaborators(context.Background(), 5)
 		if err == nil {
 			t.Fatal("expected error on 404")

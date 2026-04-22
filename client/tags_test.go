@@ -12,7 +12,7 @@ import (
 func TestTagService_Get(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/tags/5.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/tags/5.json", http.StatusOK,
 			models.TagResponse{Tag: models.Tag{ID: 5, Name: "golang", Color: "#00ADD8"}})
 
 		got, err := newTestClient(mock).Tags.Get(context.Background(), 5)
@@ -25,7 +25,7 @@ func TestTagService_Get(t *testing.T) {
 		if got.Tag.Name != "golang" {
 			t.Errorf("got name %q, want %q", got.Tag.Name, "golang")
 		}
-		if mock.GetRequests()[0].URL.Path != "/tags/5.json" {
+		if mock.GetRequests()[0].URL.Path != "/spaces/api/v1/tags/5.json" {
 			t.Errorf("unexpected path %s", mock.GetRequests()[0].URL.Path)
 		}
 	})
@@ -39,7 +39,7 @@ func TestTagService_Get(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/tags/5.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/tags/5.json", http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Tags.Get(context.Background(), 5)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -50,7 +50,7 @@ func TestTagService_Get(t *testing.T) {
 func TestTagService_List(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/tags.json", http.StatusOK,
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/tags.json", http.StatusOK,
 			models.TagsResponse{Tags: []models.Tag{{ID: 1, Name: "go"}, {ID: 2, Name: "api"}}})
 
 		got, err := newTestClient(mock).Tags.List(context.Background(), url.Values{})
@@ -64,7 +64,7 @@ func TestTagService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/tags.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/tags.json", http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Tags.List(context.Background(), url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -75,7 +75,7 @@ func TestTagService_List(t *testing.T) {
 func TestTagService_CreateBatch(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/tags.json", http.StatusCreated,
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/tags.json", http.StatusCreated,
 			models.TagsResponse{Tags: []models.Tag{
 				{ID: 10, Name: "go", Color: "#00ADD8"},
 				{ID: 11, Name: "api", Color: "#FF6B6B"},
@@ -115,7 +115,7 @@ func TestTagService_CreateBatch(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/tags.json", http.StatusBadRequest, `{"error":"bad"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/tags.json", http.StatusBadRequest, `{"error":"bad"}`)
 		_, err := newTestClient(mock).Tags.CreateBatch(context.Background(), []models.Tag{{Name: "x"}})
 		if err == nil {
 			t.Fatal("expected error on 400")
@@ -128,7 +128,7 @@ func TestTagService_Update(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/tags/5.json", http.StatusOK,
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/tags/5.json", http.StatusOK,
 			models.TagResponse{Tag: models.Tag{ID: 5, Name: "updated-tag"}})
 
 		got, err := newTestClient(mock).Tags.Update(context.Background(), 5,
@@ -161,7 +161,7 @@ func TestTagService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/tags/5.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/tags/5.json", http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Tags.Update(context.Background(), 5, &models.TagUpdate{Name: &name})
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -172,7 +172,7 @@ func TestTagService_Update(t *testing.T) {
 func TestTagService_Delete(t *testing.T) {
 	t.Run("success 204", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/tags/5.json", http.StatusNoContent, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/tags/5.json", http.StatusNoContent, "")
 		if err := newTestClient(mock).Tags.Delete(context.Background(), 5); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -183,7 +183,7 @@ func TestTagService_Delete(t *testing.T) {
 
 	t.Run("success 200", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/tags/5.json", http.StatusOK, "")
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/tags/5.json", http.StatusOK, "")
 		if err := newTestClient(mock).Tags.Delete(context.Background(), 5); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -197,7 +197,7 @@ func TestTagService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/tags/5.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/tags/5.json", http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Tags.Delete(context.Background(), 5); err == nil {
 			t.Fatal("expected error on 404")
 		}

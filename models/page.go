@@ -71,9 +71,20 @@ type PageResponse struct {
 	Included IncludedData `json:"included,omitempty"`
 }
 
+// PageTreeNode represents a page in the tree returned by the list endpoint.
+// The API returns pages as a nested tree, not a flat list.
+type PageTreeNode struct {
+	ID         int64          `json:"id"`
+	Slug       string         `json:"slug"`
+	Title      string         `json:"title"`
+	UpdatedAt  *time.Time     `json:"updatedAt,omitempty"`
+	ChildPages []PageTreeNode `json:"childPages"`
+}
+
 // PagesResponse is the list response wrapper for pages.
+// The API returns a single root page tree under the "pages" key.
 type PagesResponse struct {
-	Pages    []Page       `json:"pages"`
+	Pages    PageTreeNode `json:"pages"`
 	Included IncludedData `json:"included,omitempty"`
 	Meta     ResponseMeta `json:"meta"`
 }

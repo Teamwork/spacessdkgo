@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 )
 
 // Client is the top-level SDK client holding configuration and all resource services.
@@ -53,8 +54,34 @@ func WithMiddleware(mw MiddlewareFunc) Option {
 	return func(c *Client) { c.middleware = append(c.middleware, mw) }
 }
 
+const apiBasePath = "/spaces/api/v1"
+
+// normalizeBaseURL ensures the URL ends with /spaces/api/v1 exactly once,
+// with no trailing slash, regardless of what the caller passes in.
+// Matching against the suffix is case-insensitive; the host/scheme casing is preserved.
+func normalizeBaseURL(baseURL string) string {
+	if baseURL == "" {
+		return ""
+	}
+	// Strip any trailing slashes first.
+	base := strings.TrimRight(baseURL, "/")
+	lower := strings.ToLower(base)
+	// If the path already ends with the suffix, return it normalised (lowercase suffix).
+	if strings.HasSuffix(lower, apiBasePath) {
+		return base[:len(base)-len(apiBasePath)] + apiBasePath
+	}
+	// If the suffix appears earlier in the path (e.g. "/Spaces/API/v1/extra"),
+	// truncate at that position and re-append the canonical suffix.
+	if idx := strings.Index(lower, apiBasePath); idx != -1 {
+		base = base[:idx]
+	}
+	return strings.TrimRight(base, "/") + apiBasePath
+}
+
 // NewClient creates a new Client with the given base URL and options.
 func NewClient(baseURL string, opts ...Option) *Client {
+	baseURL = normalizeBaseURL(baseURL)
+
 	c := &Client{baseURL: baseURL}
 	for _, opt := range opts {
 		opt(c)

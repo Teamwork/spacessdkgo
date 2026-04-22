@@ -17,7 +17,7 @@ func main() {
 
 	baseURL := os.Getenv("SPACES_API_BASE_URL")
 	if baseURL == "" {
-		baseURL = "https://example.teamwork.com/spaces-api/api/v1"
+		baseURL = "https://example.teamwork.com/spaces/api/v1"
 	}
 	apiKey := os.Getenv("SPACES_API_KEY")
 

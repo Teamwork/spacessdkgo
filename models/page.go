@@ -45,17 +45,18 @@ type PageCreate struct {
 
 // PageUpdate holds fields that can be updated on an existing page.
 type PageUpdate struct {
-	ParentID                    *int64   `json:"parentId,omitempty"`
-	Title                       *string  `json:"title,omitempty"`
-	Slug                        *string  `json:"slug,omitempty"`
-	IsFullWidth                 *bool    `json:"isFullWidth,omitempty"`
-	IsRequiredReading           *bool    `json:"isRequiredReading,omitempty"`
-	IsPublish                   *bool    `json:"isPublish,omitempty"`
-	Tags                        *[]Tag   `json:"tags,omitempty"`
-	Content                     *string  `json:"content,omitempty"`
-	IsMinorChange               *bool    `json:"isMinorChange,omitempty"`
-	ChangeMessage               *string  `json:"changeMessage,omitempty"`
-	ReaderInlineCommentsEnabled *bool    `json:"readerInlineCommentsEnabled,omitempty"`
+	ParentID                    *int64  `json:"parentId,omitempty"`
+	Title                       *string `json:"title,omitempty"`
+	Slug                        *string `json:"slug,omitempty"`
+	IsFullWidth                 *bool   `json:"isFullWidth,omitempty"`
+	IsRequiredReading           *bool   `json:"isRequiredReading,omitempty"`
+	IsPublish                   *bool   `json:"isPublish,omitempty"`
+	Tags                        *[]Tag  `json:"tags,omitempty"`
+	Content                     *string `json:"content,omitempty"`
+	DraftVersion                *int64  `json:"draftVersion,omitempty"`
+	IsMinorChange               *bool   `json:"isMinorChange,omitempty"`
+	ChangeMessage               *string `json:"changeMessage,omitempty"`
+	ReaderInlineCommentsEnabled *bool   `json:"readerInlineCommentsEnabled,omitempty"`
 }
 
 // PageDuplicate holds fields required to duplicate a page.

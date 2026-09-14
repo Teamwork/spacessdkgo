@@ -50,7 +50,8 @@ func TestPageService_Get(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Pages.Get(context.Background(), 10, 20)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -106,7 +107,8 @@ func TestPageService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages.json",
+			http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Pages.List(context.Background(), 10, url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -141,7 +143,8 @@ func TestPageService_Home(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/homepage.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/homepage.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Pages.Home(context.Background(), 10)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -249,7 +252,8 @@ func TestPageService_Duplicate(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/duplicate.json", http.StatusBadRequest, `{"error":"bad"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/duplicate.json",
+			http.StatusBadRequest, `{"error":"bad"}`)
 		_, err := newTestClient(mock).Pages.Duplicate(context.Background(), 10, 20,
 			&models.PageDuplicate{Title: "X"})
 		if err == nil {
@@ -304,7 +308,8 @@ func TestPageService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusForbidden, `{"error":"forbidden"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20.json",
+			http.StatusForbidden, `{"error":"forbidden"}`)
 		_, err := newTestClient(mock).Pages.Update(context.Background(), 10, 20,
 			&models.PageUpdate{Title: &title})
 		if err == nil {
@@ -347,9 +352,99 @@ func TestPageService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Pages.Delete(context.Background(), 10, 20); err == nil {
 			t.Fatal("expected error on 404")
 		}
 	})
+}
+
+func TestPageService_ListWithPrivate(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mock := NewMockRoundTripper()
+		mock.AddResponse(http.MethodGet, "/spaces/api/v2/spaces/10/pages.json", http.StatusOK,
+			models.SpaceContentResponse{SpaceContent: models.SpaceContentTree{
+				Pages: models.PageTreeNode{
+					ID:         1,
+					Title:      "Home",
+					ChildPages: []models.PageTreeNode{{ID: 2, Title: "Intro"}},
+				},
+				Private: []models.PageTreeNode{{ID: 3, Title: "Salaries"}},
+			}})
+
+		got, err := newTestClient(mock).Pages.ListWithPrivate(context.Background(), 10, url.Values{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got.SpaceContent.Pages.ChildPages[0].ID != 2 {
+			t.Errorf("got open page ID %d, want 2", got.SpaceContent.Pages.ChildPages[0].ID)
+		}
+		if len(got.SpaceContent.Private) != 1 || got.SpaceContent.Private[0].ID != 3 {
+			t.Errorf("expected the private tree to survive decoding, got %+v", got.SpaceContent.Private)
+		}
+
+		// The v1 default must not be what answered: the two routes return
+		// different shapes from the same query, and a v1 body decodes into the
+		// v2 type as an empty tree rather than an error.
+		reqs := mock.GetRequests()
+		if reqs[0].URL.Path != "/spaces/api/v2/spaces/10/pages.json" {
+			t.Errorf("unexpected path %s", reqs[0].URL.Path)
+		}
+	})
+
+	t.Run("forwards query parameters", func(t *testing.T) {
+		mock := NewMockRoundTripper()
+		mock.AddResponse(http.MethodGet, "/spaces/api/v2/spaces/10/pages.json", http.StatusOK,
+			models.SpaceContentResponse{})
+
+		params := url.Values{}
+		params.Set("pageSize", "25")
+		if _, err := newTestClient(mock).Pages.ListWithPrivate(context.Background(), 10, params); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := mock.GetRequests()[0].URL.Query().Get("pageSize"); got != "25" {
+			t.Errorf("got pageSize %q, want %q", got, "25")
+		}
+	})
+
+	t.Run("invalid spaceID", func(t *testing.T) {
+		_, err := newTestClient(NewMockRoundTripper()).Pages.ListWithPrivate(context.Background(), 0, url.Values{})
+		if err == nil {
+			t.Fatal("expected error for spaceID=0")
+		}
+	})
+
+	t.Run("api error", func(t *testing.T) {
+		mock := NewMockRoundTripper()
+		mock.AddResponse(http.MethodGet, "/spaces/api/v2/spaces/10/pages.json", http.StatusNotFound,
+			`{"error":"not found"}`)
+		_, err := newTestClient(mock).Pages.ListWithPrivate(context.Background(), 10, url.Values{})
+		if err == nil {
+			t.Fatal("expected error on 404")
+		}
+	})
+}
+
+// TestBaseURLV2 pins that only the version segment moves. normalizeBaseURL
+// repairs a wrongly-configured base URL by truncating it at the v1 suffix, so a
+// builder that appended rather than swapped would answer a v1 path with "/v2"
+// stuck on the end.
+func TestBaseURLV2(t *testing.T) {
+	for _, tc := range []struct {
+		input string
+		want  string
+	}{
+		{"https://test.teamwork.com", "https://test.teamwork.com/spaces/api/v2"},
+		{"https://test.teamwork.com/spaces/api/v1", "https://test.teamwork.com/spaces/api/v2"},
+		{"https://test.teamwork.com/spaces/api/v1/extra", "https://test.teamwork.com/spaces/api/v2"},
+		{"", ""},
+	} {
+		t.Run(tc.input, func(t *testing.T) {
+			c := &Client{baseURL: normalizeBaseURL(tc.input)}
+			if got := c.baseURLV2(); got != tc.want {
+				t.Errorf("baseURLV2() = %q, want %q", got, tc.want)
+			}
+		})
+	}
 }

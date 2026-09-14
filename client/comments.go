@@ -42,7 +42,7 @@ func (s *CommentService) Get(ctx context.Context, spaceID, pageID, commentID int
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Get comment", http.StatusOK); err != nil {
 		return nil, err
@@ -51,7 +51,11 @@ func (s *CommentService) Get(ctx context.Context, spaceID, pageID, commentID int
 }
 
 // List fetches all comments for a page within a space with optional query parameters.
-func (s *CommentService) List(ctx context.Context, spaceID, pageID int64, params url.Values) (*models.CommentsResponse, error) {
+func (s *CommentService) List(
+	ctx context.Context,
+	spaceID, pageID int64,
+	params url.Values,
+) (*models.CommentsResponse, error) {
 	if spaceID <= 0 {
 		return nil, fmt.Errorf("spaceID must be greater than 0")
 	}
@@ -73,7 +77,7 @@ func (s *CommentService) List(ctx context.Context, spaceID, pageID int64, params
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "List comments", http.StatusOK); err != nil {
 		return nil, err
@@ -82,7 +86,11 @@ func (s *CommentService) List(ctx context.Context, spaceID, pageID int64, params
 }
 
 // Create creates a new comment on a page within a space.
-func (s *CommentService) Create(ctx context.Context, spaceID, pageID int64, req *models.CommentCreate) (*models.CommentResponse, error) {
+func (s *CommentService) Create(
+	ctx context.Context,
+	spaceID, pageID int64,
+	req *models.CommentCreate,
+) (*models.CommentResponse, error) {
 	if spaceID <= 0 {
 		return nil, fmt.Errorf("spaceID must be greater than 0")
 	}
@@ -109,7 +117,7 @@ func (s *CommentService) Create(ctx context.Context, spaceID, pageID int64, req 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Create comment", http.StatusOK, http.StatusCreated); err != nil {
 		return nil, err
@@ -118,7 +126,11 @@ func (s *CommentService) Create(ctx context.Context, spaceID, pageID int64, req 
 }
 
 // Update updates an existing comment.
-func (s *CommentService) Update(ctx context.Context, spaceID, pageID, commentID int64, req *models.CommentUpdate) (*models.CommentResponse, error) {
+func (s *CommentService) Update(
+	ctx context.Context,
+	spaceID, pageID, commentID int64,
+	req *models.CommentUpdate,
+) (*models.CommentResponse, error) {
 	if spaceID <= 0 {
 		return nil, fmt.Errorf("spaceID must be greater than 0")
 	}
@@ -148,7 +160,7 @@ func (s *CommentService) Update(ctx context.Context, spaceID, pageID, commentID 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Update comment", http.StatusOK); err != nil {
 		return nil, err
@@ -178,7 +190,7 @@ func (s *CommentService) Delete(ctx context.Context, spaceID, pageID, commentID 
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return s.client.checkResponse(ctx, resp, "Delete comment", http.StatusNoContent, http.StatusOK)
 }

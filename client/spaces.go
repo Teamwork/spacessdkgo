@@ -59,7 +59,7 @@ func (s *SpaceService) Create(ctx context.Context, req *models.SpaceCreate) (*mo
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Create space", http.StatusOK, http.StatusCreated); err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (s *SpaceService) Update(ctx context.Context, id int64, req *models.SpaceUp
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Update space", http.StatusOK); err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (s *SpaceService) Delete(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return s.client.checkResponse(ctx, resp, "Delete space", http.StatusNoContent, http.StatusOK)
 }
@@ -137,7 +137,7 @@ func (s *SpaceService) Collaborators(ctx context.Context, id int64) (*models.Spa
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Collaborators", http.StatusOK); err != nil {
 		return nil, err

@@ -59,7 +59,7 @@ func (s *CategoryService) Create(ctx context.Context, req *models.CategoryCreate
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Create category", http.StatusOK, http.StatusCreated); err != nil {
 		return nil, err
@@ -68,7 +68,11 @@ func (s *CategoryService) Create(ctx context.Context, req *models.CategoryCreate
 }
 
 // Update updates an existing category by ID.
-func (s *CategoryService) Update(ctx context.Context, id int64, req *models.CategoryUpdate) (*models.CategoryResponse, error) {
+func (s *CategoryService) Update(
+	ctx context.Context,
+	id int64,
+	req *models.CategoryUpdate,
+) (*models.CategoryResponse, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("id must be greater than 0")
 	}
@@ -92,7 +96,7 @@ func (s *CategoryService) Update(ctx context.Context, id int64, req *models.Cate
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Update category", http.StatusOK); err != nil {
 		return nil, err
@@ -116,7 +120,7 @@ func (s *CategoryService) Delete(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return s.client.checkResponse(ctx, resp, "Delete category", http.StatusNoContent, http.StatusOK)
 }

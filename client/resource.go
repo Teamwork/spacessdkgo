@@ -40,7 +40,7 @@ func (s *Service[T, L]) Get(ctx context.Context, id int64) (*T, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Get", http.StatusOK); err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (s *Service[T, L]) List(ctx context.Context, params url.Values) (*L, error)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "List", http.StatusOK); err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (s *Service[T, L]) Create(ctx context.Context, resource *T) (*T, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Create", http.StatusOK, http.StatusCreated); err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (s *Service[T, L]) Update(ctx context.Context, id int64, resource *T) (*T, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Update", http.StatusOK); err != nil {
 		return nil, err

@@ -53,7 +53,8 @@ func TestCommentService_Get(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20/comments/30.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20/comments/30.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Comments.Get(context.Background(), 10, 20, 30)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -67,8 +68,8 @@ func TestCommentService_List(t *testing.T) {
 		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20/comments.json", http.StatusOK,
 			models.CommentsResponse{
 				Comments: []models.CommentParent{
-					{Comment: models.Comment{ID: 1, Content: "First"}},
-					{Comment: models.Comment{ID: 2, Content: "Second"}},
+					{ID: 1, Content: "First"},
+					{ID: 2, Content: "Second"},
 				},
 			})
 
@@ -112,7 +113,8 @@ func TestCommentService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20/comments.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20/comments.json",
+			http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Comments.List(context.Background(), 10, 20, url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -164,7 +166,8 @@ func TestCommentService_Create(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/comments.json", http.StatusBadRequest, `{"error":"bad"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/comments.json",
+			http.StatusBadRequest, `{"error":"bad"}`)
 		_, err := newTestClient(mock).Comments.Create(context.Background(), 10, 20,
 			&models.CommentCreate{Content: "X"})
 		if err == nil {
@@ -227,7 +230,8 @@ func TestCommentService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20/comments/30.json", http.StatusForbidden, `{"error":"forbidden"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20/comments/30.json",
+			http.StatusForbidden, `{"error":"forbidden"}`)
 		_, err := newTestClient(mock).Comments.Update(context.Background(), 10, 20, 30,
 			&models.CommentUpdate{Content: &content})
 		if err == nil {
@@ -276,7 +280,8 @@ func TestCommentService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20/comments/30.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20/comments/30.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Comments.Delete(context.Background(), 10, 20, 30); err == nil {
 			t.Fatal("expected error on 404")
 		}

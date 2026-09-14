@@ -28,12 +28,12 @@ type CategoryUpdate struct {
 // CategoryResponse is the single-resource response wrapper for a category.
 type CategoryResponse struct {
 	Category Category     `json:"category"`
-	Included IncludedData `json:"included,omitempty"`
+	Included IncludedData `json:"included"`
 }
 
 // CategoriesResponse is the list response wrapper for categories.
 type CategoriesResponse struct {
 	Categories []Category   `json:"categories"`
-	Included   IncludedData `json:"included,omitempty"`
+	Included   IncludedData `json:"included"`
 	Meta       ResponseMeta `json:"meta"`
 }

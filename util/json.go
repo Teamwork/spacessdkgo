@@ -1,8 +1,9 @@
 package util
 
-import "maps"
-
-import "encoding/json"
+import (
+	"encoding/json"
+	"maps"
+)
 
 // MergeJSONData merges two JSON objects, with keys in override taking precedence
 // over keys in base. Both inputs must be JSON objects ({...}).

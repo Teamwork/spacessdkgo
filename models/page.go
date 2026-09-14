@@ -89,3 +89,21 @@ type PagesResponse struct {
 	Included IncludedData `json:"included,omitempty"`
 	Meta     ResponseMeta `json:"meta"`
 }
+
+// SpaceContentTree is the page tree the v2 list route answers with. It carries
+// two forests of the same node shape: Pages is the open tree, rooted at the
+// space's home page, and Private holds the restricted pages the calling user
+// can reach. A page in Private is not in Pages.
+type SpaceContentTree struct {
+	Pages   PageTreeNode   `json:"pages"`
+	Private []PageTreeNode `json:"private"`
+}
+
+// SpaceContentResponse is the list response wrapper for the v2 pages route,
+// which nests both trees under a "spaceContent" key. PagesResponse is the v1
+// shape and carries the open tree only.
+type SpaceContentResponse struct {
+	SpaceContent SpaceContentTree `json:"spaceContent"`
+	Included     IncludedData     `json:"included,omitempty"`
+	Meta         ResponseMeta     `json:"meta"`
+}

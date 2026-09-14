@@ -54,7 +54,13 @@ func WithMiddleware(mw MiddlewareFunc) Option {
 	return func(c *Client) { c.middleware = append(c.middleware, mw) }
 }
 
-const apiBasePath = "/spaces/api/v1"
+// apiBasePath is the version segment normalizeBaseURL pins on every base URL,
+// and the version every service reaches unless it asks for another.
+// apiBasePathV2 is the one route set that needs a different one.
+const (
+	apiBasePath   = "/spaces/api/v1"
+	apiBasePathV2 = "/spaces/api/v2"
+)
 
 // normalizeBaseURL ensures the URL ends with /spaces/api/v1 exactly once,
 // with no trailing slash, regardless of what the caller passes in.
@@ -76,6 +82,20 @@ func normalizeBaseURL(baseURL string) string {
 		base = base[:idx]
 	}
 	return strings.TrimRight(base, "/") + apiBasePath
+}
+
+// baseURLV2 returns the client's base URL retargeted at the v2 routes.
+//
+// normalizeBaseURL guarantees the stored URL ends with apiBasePath exactly
+// once, so swapping that suffix is the whole of it. This is deliberately a
+// per-call builder rather than a relaxation of normalizeBaseURL: callers rely
+// on that function repairing a wrongly-configured base URL, and only the routes
+// that have a v2 should reach one.
+func (c *Client) baseURLV2() string {
+	if c.baseURL == "" {
+		return ""
+	}
+	return strings.TrimSuffix(c.baseURL, apiBasePath) + apiBasePathV2
 }
 
 // NewClient creates a new Client with the given base URL and options.

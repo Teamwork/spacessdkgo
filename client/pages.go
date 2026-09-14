@@ -75,6 +75,45 @@ func (s *PageService) List(ctx context.Context, spaceID int64, params url.Values
 	return decodeJSON[models.PagesResponse](resp.Body)
 }
 
+// ListWithPrivate fetches a space's pages from
+// GET /spaces/api/v2/spaces/{spaceId}/pages.json, which answers with the open
+// page tree under "pages" and, under "private", the restricted pages the
+// calling user has access to. List reads the v1 route, which returns the open
+// tree only.
+//
+// Both routes run the same query and take the same parameters; the v1 response
+// shape simply leaves the private tree out.
+func (s *PageService) ListWithPrivate(
+	ctx context.Context,
+	spaceID int64,
+	params url.Values,
+) (*models.SpaceContentResponse, error) {
+	if spaceID <= 0 {
+		return nil, fmt.Errorf("spaceID must be greater than 0")
+	}
+
+	u := fmt.Sprintf("%s/spaces/%d/pages.json", s.client.baseURLV2(), spaceID)
+	if len(params) > 0 {
+		u = fmt.Sprintf("%s?%s", u, params.Encode())
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.doRequest(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := s.client.checkResponse(ctx, resp, "List pages", http.StatusOK); err != nil {
+		return nil, err
+	}
+	return decodeJSON[models.SpaceContentResponse](resp.Body)
+}
+
 // Home fetches the homepage of a space.
 func (s *PageService) Home(ctx context.Context, spaceID int64) (*models.PageResponse, error) {
 	if spaceID <= 0 {

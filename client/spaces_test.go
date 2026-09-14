@@ -93,7 +93,8 @@ func TestSpaceService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces.json",
+			http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Spaces.List(context.Background(), url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -264,7 +265,8 @@ func TestSpaceService_Collaborators(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/5/collaborators.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/5/collaborators.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Spaces.Collaborators(context.Background(), 5)
 		if err == nil {
 			t.Fatal("expected error on 404")

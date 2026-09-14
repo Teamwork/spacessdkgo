@@ -39,7 +39,7 @@ func (s *PageService) Get(ctx context.Context, spaceID, pageID int64) (*models.P
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Get page", http.StatusOK); err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (s *PageService) List(ctx context.Context, spaceID int64, params url.Values
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "List pages", http.StatusOK); err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (s *PageService) ListWithPrivate(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "List pages", http.StatusOK); err != nil {
 		return nil, err
@@ -130,7 +130,7 @@ func (s *PageService) Home(ctx context.Context, spaceID int64) (*models.PageResp
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Home page", http.StatusOK); err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (s *PageService) Create(ctx context.Context, spaceID int64, req *models.Pag
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Create page", http.StatusOK, http.StatusCreated); err != nil {
 		return nil, err
@@ -172,7 +172,11 @@ func (s *PageService) Create(ctx context.Context, spaceID int64, req *models.Pag
 }
 
 // Duplicate duplicates a page within a space.
-func (s *PageService) Duplicate(ctx context.Context, spaceID, pageID int64, req *models.PageDuplicate) (*models.PageResponse, error) {
+func (s *PageService) Duplicate(
+	ctx context.Context,
+	spaceID, pageID int64,
+	req *models.PageDuplicate,
+) (*models.PageResponse, error) {
 	if spaceID <= 0 {
 		return nil, fmt.Errorf("spaceID must be greater than 0")
 	}
@@ -199,7 +203,7 @@ func (s *PageService) Duplicate(ctx context.Context, spaceID, pageID int64, req 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Duplicate page", http.StatusOK, http.StatusCreated); err != nil {
 		return nil, err
@@ -208,7 +212,11 @@ func (s *PageService) Duplicate(ctx context.Context, spaceID, pageID int64, req 
 }
 
 // Update updates an existing page within a space.
-func (s *PageService) Update(ctx context.Context, spaceID, pageID int64, req *models.PageUpdate) (*models.PageResponse, error) {
+func (s *PageService) Update(
+	ctx context.Context,
+	spaceID, pageID int64,
+	req *models.PageUpdate,
+) (*models.PageResponse, error) {
 	if spaceID <= 0 {
 		return nil, fmt.Errorf("spaceID must be greater than 0")
 	}
@@ -235,7 +243,7 @@ func (s *PageService) Update(ctx context.Context, spaceID, pageID int64, req *mo
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Update page", http.StatusOK); err != nil {
 		return nil, err
@@ -262,7 +270,7 @@ func (s *PageService) Delete(ctx context.Context, spaceID, pageID int64) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return s.client.checkResponse(ctx, resp, "Delete page", http.StatusNoContent, http.StatusOK)
 }

@@ -128,7 +128,7 @@ func (c *Client) doRequest(ctx context.Context, req *http.Request) (*http.Respon
 	req.Header.Set("Accept", "application/json")
 
 	// Build the base handler that calls the underlying http.Client.
-	var handler RequestHandler = func(ctx context.Context, r *http.Request) (*http.Response, error) {
+	var handler RequestHandler = func(_ context.Context, r *http.Request) (*http.Response, error) {
 		return c.httpClient.Do(r)
 	}
 

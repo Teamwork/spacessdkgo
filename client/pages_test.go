@@ -50,7 +50,8 @@ func TestPageService_Get(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Pages.Get(context.Background(), 10, 20)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -106,7 +107,8 @@ func TestPageService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages.json",
+			http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Pages.List(context.Background(), 10, url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -141,7 +143,8 @@ func TestPageService_Home(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/homepage.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/homepage.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		_, err := newTestClient(mock).Pages.Home(context.Background(), 10)
 		if err == nil {
 			t.Fatal("expected error on 404")
@@ -249,7 +252,8 @@ func TestPageService_Duplicate(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/duplicate.json", http.StatusBadRequest, `{"error":"bad"}`)
+		mock.AddResponse(http.MethodPost, "/spaces/api/v1/spaces/10/pages/20/duplicate.json",
+			http.StatusBadRequest, `{"error":"bad"}`)
 		_, err := newTestClient(mock).Pages.Duplicate(context.Background(), 10, 20,
 			&models.PageDuplicate{Title: "X"})
 		if err == nil {
@@ -304,7 +308,8 @@ func TestPageService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusForbidden, `{"error":"forbidden"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/spaces/10/pages/20.json",
+			http.StatusForbidden, `{"error":"forbidden"}`)
 		_, err := newTestClient(mock).Pages.Update(context.Background(), 10, 20,
 			&models.PageUpdate{Title: &title})
 		if err == nil {
@@ -347,7 +352,8 @@ func TestPageService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/spaces/10/pages/20.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Pages.Delete(context.Background(), 10, 20); err == nil {
 			t.Fatal("expected error on 404")
 		}

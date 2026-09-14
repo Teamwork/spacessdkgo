@@ -60,7 +60,7 @@ func (s *TagService) CreateBatch(ctx context.Context, tags []models.Tag) ([]mode
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "CreateBatch tags", http.StatusOK, http.StatusCreated); err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (s *TagService) Update(ctx context.Context, id int64, req *models.TagUpdate
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Update tag", http.StatusOK); err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (s *TagService) Delete(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return s.client.checkResponse(ctx, resp, "Delete tag", http.StatusNoContent, http.StatusOK)
 }

@@ -41,7 +41,7 @@ func (s *SearchService) Search(ctx context.Context, filter models.SearchFilter) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if err := s.client.checkResponse(ctx, resp, "Search", http.StatusOK); err != nil {
 		return nil, err

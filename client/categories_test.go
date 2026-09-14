@@ -67,7 +67,8 @@ func TestCategoryService_List(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodGet, "/spaces/api/v1/categories.json", http.StatusInternalServerError, `{"error":"internal"}`)
+		mock.AddResponse(http.MethodGet, "/spaces/api/v1/categories.json",
+			http.StatusInternalServerError, `{"error":"internal"}`)
 		_, err := newTestClient(mock).Categories.List(context.Background(), url.Values{})
 		if err == nil {
 			t.Fatal("expected error on 500")
@@ -163,7 +164,8 @@ func TestCategoryService_Update(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/categories/3.json", http.StatusForbidden, `{"error":"forbidden"}`)
+		mock.AddResponse(http.MethodPatch, "/spaces/api/v1/categories/3.json",
+			http.StatusForbidden, `{"error":"forbidden"}`)
 		_, err := newTestClient(mock).Categories.Update(context.Background(), 3,
 			&models.CategoryUpdate{Name: &name})
 		if err == nil {
@@ -200,7 +202,8 @@ func TestCategoryService_Delete(t *testing.T) {
 
 	t.Run("api error", func(t *testing.T) {
 		mock := NewMockRoundTripper()
-		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/categories/3.json", http.StatusNotFound, `{"error":"not found"}`)
+		mock.AddResponse(http.MethodDelete, "/spaces/api/v1/categories/3.json",
+			http.StatusNotFound, `{"error":"not found"}`)
 		if err := newTestClient(mock).Categories.Delete(context.Background(), 3); err == nil {
 			t.Fatal("expected error on 404")
 		}

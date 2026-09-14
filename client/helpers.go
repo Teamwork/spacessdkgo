@@ -7,16 +7,15 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"slices"
 )
 
 // checkResponse returns nil if resp.StatusCode matches any of okCodes.
 // Otherwise it reads the body, logs the error, and returns a formatted error.
 // resp.Request must be non-nil (guaranteed by http.Client and MockRoundTripper).
 func (c *Client) checkResponse(ctx context.Context, resp *http.Response, msg string, okCodes ...int) error {
-	for _, code := range okCodes {
-		if resp.StatusCode == code {
-			return nil
-		}
+	if slices.Contains(okCodes, resp.StatusCode) {
+		return nil
 	}
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"slices"
 	"strings"
 )
 
@@ -133,8 +134,8 @@ func (c *Client) doRequest(ctx context.Context, req *http.Request) (*http.Respon
 	}
 
 	// Wrap with middleware in reverse order so the last-added runs first.
-	for i := len(c.middleware) - 1; i >= 0; i-- {
-		mw := c.middleware[i]
+	for _, mw := range slices.Backward(c.middleware) {
+
 		next := handler
 		handler = func(ctx context.Context, r *http.Request) (*http.Response, error) {
 			return mw(ctx, r, next)

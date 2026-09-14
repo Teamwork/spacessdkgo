@@ -42,11 +42,11 @@ type CommentParent struct {
 // CommentResponse is the single-resource response wrapper for a comment.
 type CommentResponse struct {
 	Comment  Comment      `json:"comment"`
-	Included IncludedData `json:"included,omitempty"`
+	Included IncludedData `json:"included"`
 }
 
 // CommentsResponse is the list response wrapper for comments.
 type CommentsResponse struct {
 	Comments []CommentParent `json:"comments"`
-	Included IncludedData    `json:"included,omitempty"`
+	Included IncludedData    `json:"included"`
 }

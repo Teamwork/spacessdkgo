@@ -68,8 +68,8 @@ func TestCommentService_List(t *testing.T) {
 		mock.AddResponse(http.MethodGet, "/spaces/api/v1/spaces/10/pages/20/comments.json", http.StatusOK,
 			models.CommentsResponse{
 				Comments: []models.CommentParent{
-					{Comment: models.Comment{ID: 1, Content: "First"}},
-					{Comment: models.Comment{ID: 2, Content: "Second"}},
+					{ID: 1, Content: "First"},
+					{ID: 2, Content: "Second"},
 				},
 			})
 

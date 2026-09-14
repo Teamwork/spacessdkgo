@@ -69,7 +69,7 @@ type PageDuplicate struct {
 // PageResponse is the single-resource response wrapper for a page.
 type PageResponse struct {
 	Page     Page         `json:"page"`
-	Included IncludedData `json:"included,omitempty"`
+	Included IncludedData `json:"included"`
 }
 
 // PageTreeNode represents a page in the tree returned by the list endpoint.
@@ -86,7 +86,7 @@ type PageTreeNode struct {
 // The API returns a single root page tree under the "pages" key.
 type PagesResponse struct {
 	Pages    PageTreeNode `json:"pages"`
-	Included IncludedData `json:"included,omitempty"`
+	Included IncludedData `json:"included"`
 	Meta     ResponseMeta `json:"meta"`
 }
 
@@ -104,6 +104,6 @@ type SpaceContentTree struct {
 // shape and carries the open tree only.
 type SpaceContentResponse struct {
 	SpaceContent SpaceContentTree `json:"spaceContent"`
-	Included     IncludedData     `json:"included,omitempty"`
+	Included     IncludedData     `json:"included"`
 	Meta         ResponseMeta     `json:"meta"`
 }

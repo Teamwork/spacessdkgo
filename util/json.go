@@ -1,5 +1,7 @@
 package util
 
+import "maps"
+
 import "encoding/json"
 
 // MergeJSONData merges two JSON objects, with keys in override taking precedence
@@ -12,8 +14,6 @@ func MergeJSONData(base, override []byte) ([]byte, error) {
 	if err := json.Unmarshal(override, &overrideMap); err != nil {
 		return nil, err
 	}
-	for k, v := range overrideMap {
-		baseMap[k] = v
-	}
+	maps.Copy(baseMap, overrideMap)
 	return json.Marshal(baseMap)
 }

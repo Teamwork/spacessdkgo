@@ -57,12 +57,12 @@ type SpaceCollaboratorsResponse struct {
 // SpaceResponse is the single-resource response wrapper for a space.
 type SpaceResponse struct {
 	Space    Space        `json:"space"`
-	Included IncludedData `json:"included,omitempty"`
+	Included IncludedData `json:"included"`
 }
 
 // SpacesResponse is the list response wrapper for spaces.
 type SpacesResponse struct {
 	Spaces   []Space      `json:"spaces"`
-	Included IncludedData `json:"included,omitempty"`
+	Included IncludedData `json:"included"`
 	Meta     ResponseMeta `json:"meta"`
 }

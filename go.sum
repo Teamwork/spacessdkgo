@@ -1,4 +1,4 @@
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
-github.com/sonh/qs v0.7.0 h1:tZZFBpFOpUx3gutixj3U0Z7a6ZfRoX6L7ru043QjhW0=
-github.com/sonh/qs v0.7.0/go.mod h1:8PGnJKqzv2SuLV/1gp4ZauzqnyG/8TwJOGvLZzyc800=
+github.com/sonh/qs v0.7.1 h1:rqN8X/FkXgdnGqTkCvvSu5Fey4C1XTETHV4HEQG2s2w=
+github.com/sonh/qs v0.7.1/go.mod h1:8PGnJKqzv2SuLV/1gp4ZauzqnyG/8TwJOGvLZzyc800=
